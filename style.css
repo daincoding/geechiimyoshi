@@ -1,0 +1,455 @@
+
+*/
+
+/* -------------------------
+   Page tint & font smoothing
+   - sets page background gradient and font rendering
+*/
+html, body {
+  /* page background gradient: top color -> bottom color (subtle tint) */
+  background: linear-gradient(180deg, rgba(244,239,236,0.35), rgba(240,244,248,0.30)) !important;
+  /* apply an overall blur to the page background (may be stripped by some platforms) */
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important; /* vendor-prefixed fallback */
+  /* base text color for the page */
+  color: #2c2c2c !important;
+  /* system UI fonts stack for crisp look */
+  font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial !important;
+  /* improve font rendering on WebKit */
+  -webkit-font-smoothing: antialiased !important;
+  /* improve font rendering on Firefox/Mac */
+  -moz-osx-font-smoothing: grayscale !important;
+  /* ensure the page has no unexpected margin */
+  margin: 0;
+  /* small padding around the page for demo/layout */
+  padding: 18px;
+  /* ensure box sizing is consistent */
+  box-sizing: border-box;
+}
+
+/* -------------------------
+   Frosted panels (applies widely)
+   - background, border, radius, blur and base shadow
+   - position:relative creates a stacking context for the ::after glow
+*/
+.profile .panel,
+.profile .module,
+.profile .box,
+.panel, .module, .box, .card, .contentBox, .profile-section {
+  /* make pseudo-elements positioned relative to the panel */
+  position: relative !important;
+
+  /* semi-transparent white background to create glass effect */
+  background: rgba(255,255,255,0.26) !important;
+
+  /* subtle border that reads well on many backgrounds */
+  border: 1px solid rgba(255,255,255,0.35) !important;
+
+  /* rounded corners for a soft UI */
+  border-radius: 14px !important;
+
+  /* inner spacing between content and panel edges */
+  padding: 14px !important;
+
+  /* backdrop blur + saturation to create frosted/glass look (may be removed by some platforms) */
+  backdrop-filter: blur(18px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(120%) !important; /* vendor-prefixed fallback */
+
+  /* main drop + inset sheen to sell the glass material */
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.45) !important;
+
+  /* darker text color so content is readable on the frosted surface */
+  color: #213042 !important;
+
+  /* ensure padding is part of element size */
+  box-sizing: border-box !important;
+
+  /* smooth transitions on transforms and shadows */
+  transition: transform .18s ease, box-shadow .18s ease !important;
+}
+
+/* Slightly stronger inner panels for emphasis */
+.profile .panel.strong,
+.profile .panel .sub-panel,
+.panel.strong {
+  /* a slightly more opaque white for emphasized sub-panels */
+  background: rgba(255,255,255,0.34) !important;
+}
+
+/* -------------------------
+   Panel hover (lift + glow)
+   - subtle transform and purple accent glow on hover
+*/
+.panel:hover,
+.module:hover,
+.box:hover,
+.card:hover {
+  /* lift and tiny scale for hover feedback */
+  transform: translateY(-6px) scale(1.008) !important;
+
+  /* purple halo + deeper shadow for hover state */
+  box-shadow:
+    0 0 44px rgba(110,50,200,0.48),
+    0 26px 60px rgba(40,10,120,0.36) !important;
+}
+
+/* pseudo-element used to add a soft white halo behind panels on hover */
+.panel::after,
+.module::after,
+.box::after {
+  /* empty content (visual only) */
+  content: "";
+  /* absolute positioning within the panel */
+  position: absolute;
+  /* don't block pointer events */
+  pointer-events: none;
+  /* stretch to fill the host panel */
+  inset: 0;
+  /* copy the panel's corner rounding */
+  border-radius: inherit;
+  /* start hidden */
+  opacity: 0;
+  /* animate opacity and blur */
+  transition: opacity .18s ease, filter .18s ease;
+  /* soft white halo */
+  box-shadow: 0 0 60px 16px rgba(255,255,255,0.06);
+  /* behind normal content */
+  z-index: 0;
+}
+/* show the halo on hover */
+.panel:hover::after,
+.module:hover::after,
+.box:hover::after { 
+  opacity: 1; 
+  filter: blur(6px); 
+}
+
+/* ensure direct children sit above the pseudo-element halo */
+.panel > *,
+.module > *,
+.box > * { 
+  position: relative; 
+  z-index: 1; 
+}
+
+/* -------------------------
+   Header pills (rounded title bars)
+   - pill gradient, text glow, and pill shape
+*/
+.panel .panel-heading,
+.card-header,
+.sectionHeader,
+.profileSection h3,
+.panel-heading,
+.contentBox .title,
+.module .title {
+  /* pill gradient top->bottom */
+  background: linear-gradient(180deg,#9aaed3,#7f94c0) !important;
+
+  /* white pill text color */
+  color: #fff !important;
+
+  /* internal padding inside the pill */
+  padding: 10px 14px !important;
+
+  /* fully rounded pill */
+  border-radius: 999px !important;
+
+  /* remove default borders (we draw our own) */
+  border: none !important;
+
+  /* subtle shadow below pill */
+  box-shadow: 0 6px 16px rgba(80,100,140,0.06) !important;
+
+  /* use flex so the pill can justify content (title + extras) */
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+
+  /* stacked white glows to make the pill text pop */
+  text-shadow:
+    0 0 6px rgba(255,255,255,0.9),
+    0 0 14px rgba(255,255,255,0.8),
+    0 0 24px rgba(220,230,255,0.7);
+
+  /* bold label for good contrast */
+  font-weight:700 !important;
+}
+
+/* header invert on hover/selected (contrast state) */
+.panel:hover .panel-heading,
+.panel.selected .panel-heading,
+.module:hover .title,
+.module.selected .title {
+  /* pill turns white when panel is active/hovered */
+  background: #ffffff !important;
+
+  /* pill text becomes dark blue for readability */
+  color: #234067 !important;
+
+  /* stronger shadow for active state */
+  box-shadow: 0 8px 22px rgba(30,60,120,0.08) !important;
+
+  /* remove text glow for legibility */
+  text-shadow: none !important;
+}
+
+/* ensure header children inherit inverted color when active */
+.panel:hover .panel-heading * ,
+.panel.selected .panel-heading * {
+  color: #234067 !important;
+}
+
+/* -------------------------
+   Circular profile picture defaults
+   - size, ring, shadow; edit values to tweak
+*/
+.profile .avatar img,
+.profile-avatar img,
+img.user-avatar,
+.memberAvatar img,
+.avatar-img,
+.profile .profileAvatar img {
+  /* explicit avatar width */
+  width: 96px !important;
+
+  /* explicit avatar height */
+  height: 96px !important;
+
+  /* make the image circular */
+  border-radius:50% !important;
+
+  /* ensure image covers the box without distortion */
+  object-fit:cover !important;
+
+  /* white ring around avatar for separation from background */
+  border: 4px solid rgba(255,255,255,0.92) !important;
+
+  /* drop shadow for depth */
+  box-shadow: 0 10px 28px rgba(80,100,140,0.10) !important;
+
+  /* fallback background if the image has transparency */
+  background: rgba(255,255,255,0.10) !important;
+
+  /* ensure it displays as a block-level image */
+  display:block !important;
+}
+
+/* remove duplicate/blank blurb avatar placeholders */
+.profile .blurb img,
+.profile .blurb-avatar img,
+.about-avatar img {
+  display:none !important;
+}
+
+/* -------------------------
+   Links, accents and base text
+   - default link color and hover tone
+*/
+a, .link, .profile a { 
+  /* default link color (muted purple-blue) */
+  color: #6d7fb5 !important; 
+}
+a:hover { 
+  /* lighter/paler link color on hover */
+  color: #9fa7d6 !important; 
+}
+
+/* -------------------------
+   Buttons (generic base)
+   - base visuals for buttons (kept minimal)
+*/
+button, .btn, input[type="submit"], .submit {
+  /* translucent button background */
+  background: rgba(199,207,230,0.28) !important;
+
+  /* light border for button */
+  border: 1px solid rgba(181,189,217,0.32) !important;
+
+  /* button text color */
+  color: #2c2c2c !important;
+
+  /* rounded corners for buttons */
+  border-radius: 10px !important;
+
+  /* button padding */
+  padding: 8px 12px !important;
+
+  /* show pointer cursor on hover */
+  cursor: pointer;
+
+  /* smooth transition on hover effects */
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+button:hover, .btn:hover, input[type="submit"]:hover {
+  /* small lift on hover */
+  transform: translateY(-2px);
+
+  /* subtle shadow on hover */
+  box-shadow: 0 10px 20px rgba(80,100,140,0.06);
+}
+
+/* -------------------------
+   Condensed / MZ inline grid (links)
+   - matched to panel tone and header pill gradient
+*/
+.mz-condensed-inline{
+  /* full width container with constrained max width */
+  width:100% !important;
+  max-width:860px !important;
+
+  /* center and vertical spacing */
+  margin:10px auto !important;
+  padding:14px !important;
+
+  /* rounded outer corners */
+  border-radius:18px !important;
+
+  /* frosted background for the container (slightly stronger) */
+  background: rgba(255,255,255,0.30) !important;
+
+  /* blur for the container (may be removed by some platforms) */
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+
+  /* soft border for container */
+  border:1px solid rgba(199,207,230,0.36) !important;
+
+  /* shallow shadow for elevation */
+  box-shadow: 0 12px 30px rgba(143,162,204,0.05) !important;
+
+  /* consistent sizing behavior */
+  box-sizing:border-box !important;
+
+  /* ensure consistent UI font inside */
+  font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
+}
+
+/* header row inside condensed panel */
+.mz-condensed-inline .mz-header { 
+  display:flex; 
+  justify-content:space-between; 
+  align-items:center; 
+  margin-bottom:12px; 
+}
+
+/* condensed title pill uses same header gradient */
+.mz-condensed-inline .mz-title{
+  background:linear-gradient(180deg,#9aaed3,#7f94c0) !important;
+  color:#fff !important;
+  padding:8px 14px !important;
+  border-radius:999px !important;
+  font-weight:700 !important;
+}
+
+/* grid layout inside condensed panel (default 3 columns) */
+.mz-condensed-inline .mz-grid {
+  display:grid !important;
+  grid-template-columns: repeat(3, minmax(140px, 1fr)) !important;
+  gap:12px !important;
+}
+
+/* tile appearance in condensed grid */
+.mz-condensed-inline .mz-item {
+  display:flex; 
+  align-items:center; 
+  gap:10px; /* gap between icon and label */
+  padding:10px 12px; /* inner padding for pill tiles */
+  border-radius:12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(236,243,255,0.96)) !important; /* tile bg */
+  border:1px solid rgba(199,207,230,0.6) !important;
+  color:#3b5b88; 
+  font-weight:600; 
+  text-decoration:none; 
+  min-height:46px;
+  box-shadow:0 6px 18px rgba(143,162,204,0.03);
+}
+
+/* circular icon inside each tile */
+.mz-condensed-inline .mz-icon {
+  width:36px; 
+  height:36px; 
+  border-radius:999px; 
+  display:flex; 
+  align-items:center; 
+  justify-content:center;
+  background: linear-gradient(180deg,#eef6ff,#e8f3ff) !important; /* icon bg */
+  color:#466092; 
+  font-size:15px; 
+  flex-shrink:0;
+  border:1px solid rgba(199,207,230,0.8);
+}
+
+/* tile label color and size */
+.mz-condensed-inline .mz-label { 
+  font-size:13.5px; 
+  color:#2b3b58 !important; 
+}
+
+/* responsive breakpoints */
+@media (max-width:1100px){
+  .mz-condensed-inline .mz-grid{ 
+    grid-template-columns: repeat(2, minmax(140px, 1fr)) !important; 
+  }
+}
+@media (max-width:520px){
+  .mz-condensed-inline .mz-grid{ 
+    grid-template-columns: 1fr !important; 
+  }
+  .mz-condensed-inline .mz-item{ 
+    padding:10px 12px; 
+    min-height:56px; 
+  }
+}
+
+/* -------------------------
+   Comments / mini-cards visuals
+   - inner message boxes, comment header pill
+*/
+.comment, .comments .comment, .comment-list li, .comment-box {
+  background: rgba(255,255,255,0.18) !important;     /* light reply box */
+  border: 1px solid rgba(211,217,238,0.14) !important;
+  border-radius: 10px !important;
+  padding: 10px 12px !important;
+  margin-bottom: 10px !important;
+  box-shadow: 0 8px 18px rgba(143,162,204,0.03) !important;
+}
+
+/* comment area styling (dark background for comments) */
+.comments, .comment-list, .panel.comments, .panel .comments, .profile .comments {
+  background: linear-gradient(180deg, rgba(12,12,12,0.92), rgba(18,18,18,0.86)) !important; /* dark comment area */
+  color: #e9eef6 !important;                       /* light text for contrast */
+  border: 1px solid rgba(80,100,140,0.16) !important;
+  box-shadow: 0 12px 30px rgba(10,10,10,0.26) !important;
+}
+
+/* -------------------------
+   Helpers & fallbacks
+   - overflow, truncation and avatar inline-style fallback
+*/
+.profile .panel, .profile .module, .card, .contentBox { overflow: visible !important; } /* avoid accidental clipping */
+.top8 img[style], .top8List img[style] { width:auto !important; height:auto !important; } /* inline style fallback */
+
+#mzAvatarMirror { width: clamp(72px, 10vw, 110px) !important; height: clamp(72px, 10vw, 110px) !important; } /* responsive avatar helper */
+
+/* keep long names on a single line */
+.profile .panel .title, .profile .profileName, .profile h1 { 
+  white-space: nowrap !important; 
+  overflow: hidden !important; 
+  text-overflow: ellipsis !important; 
+}
+
+/* logo */
+.profile-page.profile-custom-css .profile-display-name {
+    content: url(https://files.catbox.moe/zvqoik.png) !important;
+    height: 100% !important;
+    width: 100% !important;
+    margin: 0 auto
+
+#}
+
+/* -------------------------
+   End of CSS 
+   ------------------------- */
